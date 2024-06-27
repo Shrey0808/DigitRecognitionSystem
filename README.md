@@ -1,21 +1,30 @@
-# Project Description: Handwritten Digit Recognition using Convolutional Neural Network (CNN)
+# Project Description: Handwritten Number Predictor using Convolutional Neural Network (CNN)
 
 ## Abstract:
-This project focuses on implementing a Convolutional Neural Network (CNN) for the task of handwritten digit recognition using the MNIST dataset. The CNN is trained to classify images of handwritten digits into their respective numerical labels (0-9). The model is built using the Tensorflow deep learning framework and achieves high accuracy on the test set. The project involves data preprocessing, model architecture definition, training, and testing phases.
-
+The aim of this project is to predict handwritten numbers from image inputs using deep learning and computer vision techniques.
+  
 ## Table of Contents:
 1. Introduction
 2. Dataset Understanding
 3. Data Preprocessing
 4. Model Architecture
-5. Training Phase
-6. Testing Phase
-7. Results
-8. Conclusion
+5. Base model Training Phase
+6. Base model Testing Phase
+7. Final Number Prediction
+8. Results
+9. Conclusion
 
 ## 1. Introduction:
-Handwritten digit recognition is a classic problem in computer vision and serves as a foundational task for understanding deep learning concepts. This project employs a CNN to recognize and classify digits from the MNIST dataset, a widely used benchmark dataset for image classification tasks.
+Handwritten digit recognition is a classic problem in computer vision and serves as a foundational task for understanding deep learning concepts. This project takes this problem to a whole new different level. My current model consists of :
 
+- **Base Model: Digit Recognition System**
+  - Trained using the MNIST dataset with 60,000 training images and 10,000 testing images.
+  - Achieves an accuracy of 99.10% on the testing dataset.
+  - Implemented with Convolutional Neural Networks (CNN) for effective feature extraction and classification.
+
+- **Advanced Model: Computer Vision for Digit Segmentation**
+  - Utilizes computer vision techniques to segment handwritten number images into individual digits.
+  - Makes predictions for each segmented digit using the base CNN model.
 
 ## 2. Dataset Understanding :
 The MNIST dataset contains 60,000 images to train the model and 10,000 images to test the accuracy of the model. Each image is of size (28x28) with each pixel value ranging from 0 to 255. 
@@ -64,15 +73,27 @@ The CNN architecture of this model consists of several layers that are designed 
   
 - **Metrics**: The model is evaluated based on accuracy (`'accuracy'`), which measures the fraction of correctly classified images.
 
-## 5. Training Phase:
+### Computer Vision Architecture
+
+1. **Base layer Loading**
+   - The trained Handwritten Digit Predictor Model is loaded which serves as the base layer for our project.
+2. **Image input**
+   - A User-Friendly website design is made to upload the images of handwritten numbers. The frontend of the website is designed using HTML/CSS and Javascript whereas the backend is built on Flask architecture.
+3. **Image Preprocessing**
+   - The input image is read using OpenCV and firstly converted to grayscale. Gaussian blur and adaptive thresholding is applied to enhance the digits extraction. Finally the contours of the digits are found.
+
+
+## 5. Base model Training Phase:
 The model is trained using the Adam optimizer and sparse_categorical_crossentropy loss. The training loop iterates through the MNIST training dataset, updating the model's weights to minimize the classification loss. Training progress is monitored through the display of loss values per epoch.
 
-## 6. Testing Phase:
+## 6. Base model Testing Phase:
 The trained model is evaluated on a separate test set to assess its generalization performance. The accuracy on the test set is calculated, demonstrating the model's ability to accurately classify unseen handwritten digits.
 
-## 7. Results:
+## 7. Final Number Prediction
+The model iterates through the identified contours, extracting each digit and preprocessing it for model prediction. The extracted digits are resized to 28x28x1 pixels and then normalized for model input. Each extracted digit is then passed to the loaded model to predict the class label.
+
+## 8. Results:
 The trained CNN achieves a high accuracy of 99.10% on the MNIST test set, showcasing its effectiveness in recognizing handwritten digits.
 
-
-## 8. Conclusion
-This project serves as a valuable resource for understanding the implementation of a CNN for handwritten digit recognition, making it suitable for both educational purposes and practical applications.
+## 9. Conclusion
+This project serves as a valuable resource for understanding the implementation of a CNN for handwritten number recognition and CV for digit extraction, making it suitable for both educational purposes and practical applications.
