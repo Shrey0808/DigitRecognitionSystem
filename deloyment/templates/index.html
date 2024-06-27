@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Prediction</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .prediction-item {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Number Prediction</h1>
+
+    <!-- Image Upload Form -->
+    <form id="imageUploadForm" enctype="multipart/form-data" action="/predict" method="POST">
+      <div class="custom-file mb-3">
+        <input type="file" class="custom-file-input" id="imageFile" name="imageFile" accept=".jpg, .jpeg, .png" required multiple>
+        <label class="custom-file-label" for="imageFile">Choose image file(s)...</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Predict</button>
+    </form>
+
+    <!-- Prediction Results Section -->
+    <div id="predictionResults" class="mt-4">
+      <!-- Placeholder for prediction results -->
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and dependencies (optional) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+  <!-- Your custom JavaScript for handling image upload and prediction -->
+  <script>
+    document.getElementById('imageUploadForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var formData = new FormData(this);
+
+      // Example: Replace with your actual handling of form data and prediction results
+      fetch('/predict', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        displayPredictionResults(data.predictions, data.images);
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    function displayPredictionResults(predictions, images) {
+      var resultsContainer = document.getElementById('predictionResults');
+      resultsContainer.innerHTML = '';
+
+      predictions.forEach((prediction, index) => {
+        var predictionItem = document.createElement('div');
+        predictionItem.classList.add('prediction-item');
+        predictionItem.innerHTML = `
+          <h4>Prediction ${index + 1}:</h4>
+          <p>${prediction}</p>
+          <img src="${images[index]}" class="img-fluid" alt="Predicted Image ${index + 1}">
+        `;
+        resultsContainer.appendChild(predictionItem);
+      });
+    }
+  </script>
+</body>
+</html>
