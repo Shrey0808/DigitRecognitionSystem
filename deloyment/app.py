@@ -1,48 +1,39 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
-from prediction import preprocess_and_extract_digits
 import os
-import cv2
+from prediction import preprocess_and_predict
+import numpy as np
 
 app = Flask(__name__)
-
-# Folder to save uploaded images
-UPLOAD_FOLDER = 'static/uploads'
-PROCESSED_FOLDER = 'static/processed'
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 
-# Allowed file extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# Mock function for illustration, replace with actual implementation
+def preprocess_and_predict(img_path):
+    # Example: Loading image using PIL or OpenCV
+    img_array = np.array([img_path])  # Replace with actual image processing logic
+    predictions = np.array(['Prediction A', 'Prediction B'])  # Replace with actual predictions
+    return img_array, predictions
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(img_path)
-            predictions, images = preprocess_and_extract_digits(img_path)
-            
-            processed_filenames = []
-            for idx, img in enumerate(images):
-                processed_filename = f"processed_{idx}.png"
-                processed_path = os.path.join(app.config['PROCESSED_FOLDER'], processed_filename)
-                cv2.imwrite(processed_path, img)
-                processed_filenames.append(processed_filename)
-            
-            return render_template('index.html', uploaded_filename=filename, processed_filenames=processed_filenames, predictions=predictions)
     return render_template('index.html')
 
-app.jinja_env.globals.update(zip=zip)
+@app.route('/predict', methods=['POST'])
+def predict():
+    if request.method == 'POST' and 'image' in request.files:
+        img = request.files['image']
+        if img.filename == '':
+            return redirect(request.url)
+        if img:
+            filename = secure_filename(img.filename)
+            img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            img.save(img_path)
+            predictions,img_array = preprocess_and_predict(img_path)
+            print(predictions)
+            return jsonify(predictions.tolist())
+    
+    return 'Error in uploading image'
 
 if __name__ == '__main__':
     app.run(debug=True)
