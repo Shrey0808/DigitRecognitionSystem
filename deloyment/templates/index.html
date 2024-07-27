@@ -9,11 +9,6 @@
     <style>
         body {
             background-color: #e8f0fe;
-            display: flex;
-            justify-content: center;
-            align-items: center; 
-            height: 100vh;
-            margin: 0;
         }
 
         .container {
@@ -23,8 +18,8 @@
             padding: 25px;
             max-width: 400px;
             text-align: center;
-            margin-top: 20%;
-            margin-bottom: 20%;
+            margin-top: 5%;
+            margin-bottom: 5%;
         }
 
         h2 {
@@ -92,7 +87,7 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" id="res">
         <h2>Upload an Image</h2>
         <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
             <div class="form-group">
@@ -105,7 +100,18 @@
             </div>
             <button type="submit" class="btn btn-primary">Upload Image</button>
         </form>
-        <div class="results" id="results"></div>
+        <div class="results" id="results">
+            {% if results %}
+                {% for result in results %}
+                    <div class="result-item">
+                        <img src="data:image/png;base64,{{ result.digit_image }}" alt="Prediction Image">
+                        <p>{{ result.prediction }}</p>
+                    </div>
+                {% endfor %}
+            {% elif error %}
+                <p>Error: {{ error }}</p>
+            {% endif %}
+        </div>
     </div>
     <script>
         const dropzone = document.getElementById('dropzone');
@@ -128,57 +134,29 @@
             dropzone.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length) {
-                imageInput.files = files;
-                displayPreview(files[0]);
+                handleFiles(files);
             }
+           
         });
 
-        imageInput.addEventListener('change', (e) => displayPreview(e.target.files[0]));
+        imageInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            if (files.length) {
+                imageInput.files = files; // Update the file input
+                displayPreview(files[0]); // Display preview of the first file
+            }
+        }
 
         function displayPreview(file) {
+            // e.preventDefault();
             const reader = new FileReader();
             reader.onload = (e) => {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
             };
             reader.readAsDataURL(file);
-        }
-
-        uploadForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(uploadForm);
-            fetch('/predict', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    displayResults(data);
-                })
-                .catch(error => console.error('Error:', error));
-        });
-
-        function displayResults(data) {
-            resultsDiv.innerHTML = '';
-            if (data.error) {
-                resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
-            } else {
-                for (let i = 0; i < data.predictions.length; i++) {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'result-item';
-                    
-                    const imgElement = document.createElement('img');
-                    imgElement.src = `data:image/png;base64,${data.digit_images[i]}`;
-                    
-                    const predElement = document.createElement('p');
-                    predElement.textContent = data.predictions[i];
-                    
-                    resultItem.appendChild(imgElement);
-                    resultItem.appendChild(predElement);
-                    
-                    resultsDiv.appendChild(resultItem);
-                }
-            }
+            
         }
     </script>
 </body>
