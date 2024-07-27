@@ -11,7 +11,7 @@
             background-color: #e8f0fe;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: center; 
             height: 100vh;
             margin: 0;
         }
@@ -23,6 +23,8 @@
             padding: 25px;
             max-width: 400px;
             text-align: center;
+            margin-top: 20%;
+            margin-bottom: 20%;
         }
 
         h2 {
@@ -60,29 +62,57 @@
             margin-top: 20px;
             border-radius: 8px;
         }
+
+        .results {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px;
+        }
+
+        .result-item img {
+            width: 48px;
+            margin-bottom: 50px;
+        }
+
+        .result-item p {
+            font-weight: bold;
+            color: #007bff;
+            margin: 0;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h2>Upload an Image</h2>
-        <form action="/predict" method="post" enctype="multipart/form-data">
+        <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="image" class="form-label">Choose an image to upload</label>
                 <div id="dropzone" class="dropzone">
-                    <img src="static\images\upload.png" alt="Click here to choose image to upload">
+                    <img src="static/images/upload.png" alt="Click here to choose image to upload">
                 </div>
-                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required
-                    style="display: none;">
+                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required style="display: none;">
                 <img id="preview" src="#" alt="Image Preview" style="display: none;">
             </div>
             <button type="submit" class="btn btn-primary">Upload Image</button>
         </form>
+        <div class="results" id="results"></div>
     </div>
     <script>
         const dropzone = document.getElementById('dropzone');
         const imageInput = document.getElementById('image');
         const preview = document.getElementById('preview');
+        const uploadForm = document.getElementById('upload-form');
+        const resultsDiv = document.getElementById('results');
 
         dropzone.addEventListener('click', () => imageInput.click());
 
@@ -112,6 +142,43 @@
                 preview.style.display = 'block';
             };
             reader.readAsDataURL(file);
+        }
+
+        uploadForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(uploadForm);
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data);
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        function displayResults(data) {
+            resultsDiv.innerHTML = '';
+            if (data.error) {
+                resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            } else {
+                for (let i = 0; i < data.predictions.length; i++) {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    
+                    const imgElement = document.createElement('img');
+                    imgElement.src = `data:image/png;base64,${data.digit_images[i]}`;
+                    
+                    const predElement = document.createElement('p');
+                    predElement.textContent = data.predictions[i];
+                    
+                    resultItem.appendChild(imgElement);
+                    resultItem.appendChild(predElement);
+                    
+                    resultsDiv.appendChild(resultItem);
+                }
+            }
         }
     </script>
 </body>
