@@ -113,6 +113,7 @@
             {% endif %}
         </div>
     </div>
+    <!--  THIS JAVASCRIPT FILE CODE IS NOT AT ALL IMPORTANT. THIS IS ONLY ADDED FOR DRAG - AND DROP FEATURE AND PREVIEWING THE UPLOADED IMAGE -->
     <script>
         const dropzone = document.getElementById('dropzone');
         const imageInput = document.getElementById('image');
@@ -134,22 +135,15 @@
             dropzone.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length) {
-                handleFiles(files);
+                imageInput.files = files; 
+                displayPreview(files[0]); 
             }
            
         });
 
         imageInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-        function handleFiles(files) {
-            if (files.length) {
-                imageInput.files = files; // Update the file input
-                displayPreview(files[0]); // Display preview of the first file
-            }
-        }
-
         function displayPreview(file) {
-            // e.preventDefault();
             const reader = new FileReader();
             reader.onload = (e) => {
                 preview.src = e.target.result;
